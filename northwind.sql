@@ -18,13 +18,19 @@ SELECT COUNT(*) AS 'CANTIDAD DE REGIONES' FROM `Region`;
 SELECT COUNT(*) AS 'CANTIDAD DE ORDENES' FROM `Orders`;
 
 # 6. Obtener la cantidad de empleados por región.
-SELECT em.`Region` as 'REGION', COUNT(em.`EmployeeID`) AS 'CANTIDAD DE EMPLEADOS'
-FROM `Employees` AS em
+SELECT reg.`RegionDescription` AS 'REGION', COUNT(DISTINCT em.`EmployeeID`) AS 'CANTIDAD DE EMPLEADOS'
+FROM
+    `Employees` em
+    JOIN `EmployeeTerritories` AS emt ON em.`EmployeeID` = emt.`EmployeeID`
+    JOIN `Territories` AS te ON emt.`TerritoryID` = te.`TerritoryID`
+    JOIN `Region` AS reg ON te.`RegionID` = reg.`RegionID`
 GROUP BY
-    em.`Region`;
+    reg.`RegionDescription`;
 
-# 7. Obtener la cantidad de empleados por territorio.
-SELECT te.`TerritoryDescription` AS 'TERRITORIO', COUNT(em.`EmployeeID`) AS 'CANTIDAD DE EMPLEADOS'
+# 7. Obtener la cantidad de empleados por territorio. PENDIENTE
+SELECT DISTINCT
+    te.`TerritoryDescription` AS 'TERRITORIO',
+    COUNT(DISTINCT em.`EmployeeID`) AS 'CANTIDAD DE EMPLEADOS'
 FROM
     `Employees` AS em
     JOIN `EmployeeTerritories` AS emt ON em.`EmployeeID` = emt.`EmployeeID`
@@ -33,17 +39,18 @@ GROUP BY
     te.`TerritoryDescription`;
 
 # 8. Obtener la cantidad de territorio que cubre cada empleado.
-SELECT em.`EmployeeID` AS 'ID', CONCAT(
+SELECT CONCAT(
         em.`FirstName`, ' ', em.`LastName`
-    ) AS 'NOMBRE', COUNT(*) AS 'CANTIDAD DE TERRITORIOS'
+    ) AS 'NOMBRE', COUNT(te.`TerritoryID`) AS 'CANTIDAD DE TERRITORIOS'
 FROM
     `Employees` AS em
-    INNER JOIN `EmployeeTerritories` AS emt ON em.`EmployeeID` = emt.`EmployeeID`
+    JOIN `EmployeeTerritories` AS emt ON em.`EmployeeID` = emt.`EmployeeID`
+    JOIN `Territories` AS te ON emt.`TerritoryID` = te.`TerritoryID`
 GROUP BY
     em.`EmployeeID`;
 
 # 9. Obtener las unidades vendidas de cada producto.
-SELECT prod.`ProductID` AS 'ID', prod.`ProductName` AS 'NOMBRE', SUM(od.`Quantity`) AS 'UNIDADES VENDIDAS'
+SELECT prod.`ProductName` AS 'NOMBRE', SUM(od.`Quantity`) AS 'UNIDADES VENDIDAS'
 FROM
     `Products` AS prod
     JOIN `Order Details` AS od ON prod.`ProductID` = od.`ProductID`
@@ -89,11 +96,10 @@ SELECT reg.`RegionDescription` AS 'REGION', SUM(
         od.`UnitPrice` * od.`Quantity`
     ) AS 'GANANCIAS'
 FROM
-    `Employees` AS em
-    JOIN `EmployeeTerritories` AS emt ON em.`EmployeeID` = emt.`EmployeeID`
-    JOIN `Territories` AS te ON emt.`TerritoryID` = te.`TerritoryID`
-    JOIN `Region` AS reg ON te.`RegionID` = reg.`RegionID`
-    JOIN `Orders` AS ord ON em.`EmployeeID` = ord.`EmployeeID`
+    `Region` AS reg
+    JOIN `Territories` AS te ON reg.`RegionID` = te.`RegionID`
+    JOIN `EmployeeTerritories` AS emt ON te.`TerritoryID` = emt.`TerritoryID`
+    JOIN `Orders` AS ord ON emt.`EmployeeID` = ord.`EmployeeID`
     JOIN `Order Details` AS od ON ord.`OrderID` = od.`OrderID`
 GROUP BY
     reg.`RegionDescription`;
