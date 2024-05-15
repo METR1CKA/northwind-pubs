@@ -90,11 +90,15 @@ FROM
 ORDER BY pub.pub_name, au.au_lname, au.au_fname;
 
 # 21. Mostrar las ganancias por autor.
-SELECT CONCAT(au.au_fname, ' ', au.au_lname) AS 'AUTOR', SUM(ti.price * sa.qty) AS 'GANANCIAS'
+SELECT IFNULL(
+        CONCAT(au.au_fname, ' ', au.au_lname), 'Editorial'
+    ) AS 'AUTOR', SUM(
+        ti.price * sa.qty * (ta.royaltyper / 100)
+    ) AS 'GANANCIAS'
 FROM
-    authors AS au
-    JOIN titleauthor AS ta ON au.au_id = ta.au_id
-    JOIN titles AS ti ON ta.title_id = ti.title_id
+    titles AS ti
+    LEFT JOIN titleauthor AS ta ON ti.title_id = ta.title_id
+    LEFT JOIN authors AS au ON ta.au_id = au.au_id
     JOIN sales AS sa ON ti.title_id = sa.title_id
 GROUP BY
     au.au_id;
