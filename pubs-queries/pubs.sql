@@ -88,32 +88,3 @@ FROM
     JOIN titles AS ti ON ta.title_id = ti.title_id
     JOIN publishers AS pub ON ti.pub_id = pub.pub_id
 ORDER BY pub.pub_name, au.au_lname, au.au_fname;
-
-# 21. Mostrar las ganancias por autor.
-SELECT IFNULL(
-        CONCAT(au.au_fname, ' ', au.au_lname), 'Anónimo'
-    ) AS 'AUTOR', SUM(
-        libro.total_libro * (
-            IFNULL(ta.royaltyper, 0) / 100
-        )
-    ) AS 'GANANCIAS', SUM(
-        libro.total_libro * (1 - IFNULL(tr.reg, 0) / 100)
-    ) AS 'GANANCIAS EDITORIAL'
-FROM
-    titleauthor AS ta
-    RIGHT JOIN (
-        SELECT ti.title_id, SUM(sa.qty * ti.price) AS total_libro
-        FROM sales AS sa
-            JOIN titles ti ON sa.title_id = ti.title_id
-        GROUP BY
-            ti.title_id
-    ) AS libro ON libro.title_id = ta.title_id
-    LEFT JOIN (
-        SELECT title_id, SUM(royaltyper) AS reg
-        FROM titleauthor
-        GROUP BY
-            title_id
-    ) AS tr ON tr.title_id = ta.title_id
-    LEFT JOIN authors AS au ON ta.au_id = au.au_id
-GROUP BY
-    au.au_id;
