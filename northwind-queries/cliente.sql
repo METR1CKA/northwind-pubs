@@ -1,11 +1,11 @@
--- Active: 1714881146400@@127.0.0.1@3306@northwind
+-- Active: 1717300958354@@127.0.0.1@3306@northwind
 USE northwind;
 
 ------------------------------------------------------------
 # Crear una vista que muestre todas los empleados region
-DROP VIEW IF EXISTS EmployeeRegion;
+DROP VIEW IF EXISTS employeeregion;
 
-CREATE VIEW EmployeeRegion AS
+CREATE VIEW employeeregion AS
 SELECT DISTINCT
     em.`EmployeeID`,
     reg.`RegionDescription`
@@ -15,14 +15,14 @@ FROM
     JOIN Territories AS ter ON et.`TerritoryID` = ter.`TerritoryID`
     JOIN Region AS reg ON ter.`RegionID` = reg.`RegionID`;
 
-SELECT * FROM EmployeeRegion;
+SELECT * FROM employeeregion;
 ------------------------------------------------------------
 
 ------------------------------------------------------------
 # Crear una vista que muestre todas las ganancias de los clientes
-DROP VIEW IF EXISTS CustomerPurchases;
+DROP VIEW IF EXISTS customerpurchases;
 
-CREATE VIEW CustomerPurchases AS
+CREATE VIEW customerpurchases AS
 SELECT
     cus.`CustomerID`,
     cus.`ContactName`,
@@ -43,14 +43,14 @@ GROUP BY
     YEAR(ord.`OrderDate`),
     er.`RegionDescription`;
 
-SELECT * FROM CustomerPurchases;
+SELECT * FROM customerpurchases;
 ------------------------------------------------------------
 
 ------------------------------------------------------------
 # Crear la vista de las compras máximas por año y región
-DROP VIEW IF EXISTS MaxPurchases;
+DROP VIEW IF EXISTS maxpurchases;
 
-CREATE VIEW MaxPurchases AS
+CREATE VIEW maxpurchases AS
 SELECT
     OrderYear,
     RegionDescription,
@@ -60,7 +60,7 @@ GROUP BY
     OrderYear,
     RegionDescription;
 
-SELECT * FROM MaxPurchases;
+SELECT * FROM maxpurchases;
 ------------------------------------------------------------
 
 ------------------------------------------------------------
