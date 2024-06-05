@@ -1,3 +1,7 @@
+-- Active: 1717300958354@@127.0.0.1@3306@northwind
+
+USE northwind;
+
 ------------------------------------------------------------
 DROP VIEW IF EXISTS employee_region;
 
@@ -38,6 +42,11 @@ GROUP BY
     YEAR(ord.`OrderDate`);
 
 SELECT * FROM customer_product_gains;
+
+SELECT *
+FROM customer_product_gains
+WHERE
+    ContactName = 'Ana Trujillo';
 ------------------------------------------------------------
 
 ------------------------------------------------------------
@@ -45,61 +54,92 @@ DROP VIEW IF EXISTS min_customer_product_gains;
 
 # Identificar las ganancias mínimas por cliente y región
 CREATE VIEW min_customer_product_gains AS
-SELECT
-    `CustomerID`,
-    `ContactName`,
-    `CompanyName`,
-    `RegionDescription`,
-    MIN(`Ganancias`) AS MinGanancias
-FROM customer_product_gains
+SELECT cpg.`CustomerID`, cpg.`ContactName`, cpg.`RegionDescription`, cpg.`ProductName`, MIN(cpg.`Ganancias`) AS MinGanancias
+FROM customer_product_gains AS cpg
 GROUP BY
-    `CustomerID`,
-    `RegionDescription`;
+    cpg.`CustomerID`,
+    cpg.`RegionDescription`
+ORDER BY cpg.`CustomerID`, cpg.`ContactName`;
 
 SELECT * FROM min_customer_product_gains;
+
+SELECT *
+FROM
+    min_customer_product_gains AS mcpg
+WHERE
+    mcpg.`ContactName` = 'Ana Trujillo';
+------------------------------------------------------------
+
+------------------------------------------------------------
+DROP VIEW IF EXISTS all_years_product_region;
+
+# Mostrar todos los años de un producto en una región
+CREATE VIEW all_years_product_region AS
+SELECT cpg.`CustomerID`, cpg.`ContactName`, cpg.`RegionDescription`, cpg.`ProductName`, GROUP_CONCAT(
+        DISTINCT cpg.`Año`
+        ORDER BY cpg.`Año` ASC
+    ) AS Años
+FROM customer_product_gains AS cpg
+GROUP BY
+    cpg.`CustomerID`,
+    cpg.`RegionDescription`
+ORDER BY cpg.`CustomerID`, cpg.`ContactName`;
+
+SELECT * FROM all_years_product_region;
+
+SELECT *
+FROM all_years_product_region AS aypr
+WHERE
+    aypr.`ContactName` = 'Ana Trujillo';
 ------------------------------------------------------------
 
 ------------------------------------------------------------
 # Consulta final que utiliza las vistas para agrupar y concatenar los productos menos comprados por cliente y región
-SELECT cpg.`ContactName` AS 'CONTACTO', IFNULL(
+SELECT cpg.`ContactName` AS 'CONTACTO', cpg.`CompanyName` AS 'COMPAÑIA', IFNULL(
         GROUP_CONCAT(
             CASE
                 WHEN cpg.`RegionDescription` = 'Northern' THEN CONCAT(
-                    cpg.`ProductName`, '-', cpg.`Año`
+                    cpg.`ProductName`, ' - ', aypr.Años, ' - ', mcpg.MinGanancias
                 )
-            END SEPARATOR ', '
+            END SEPARATOR '; '
         ), 'N/A'
     ) AS 'NORTE', IFNULL(
         GROUP_CONCAT(
             CASE
                 WHEN cpg.`RegionDescription` = 'Southern' THEN CONCAT(
-                    cpg.`ProductName`, '-', cpg.`Año`
+                    cpg.`ProductName`, ' - ', aypr.Años, ' - ', mcpg.MinGanancias
                 )
-            END SEPARATOR ', '
+            END SEPARATOR '; '
         ), 'N/A'
     ) AS 'SUR', IFNULL(
         GROUP_CONCAT(
             CASE
                 WHEN cpg.`RegionDescription` = 'Eastern' THEN CONCAT(
-                    cpg.`ProductName`, '-', cpg.`Año`
+                    cpg.`ProductName`, ' - ', aypr.Años, ' - ', mcpg.MinGanancias
                 )
-            END SEPARATOR ', '
+            END SEPARATOR '; '
         ), 'N/A'
     ) AS 'ESTE', IFNULL(
         GROUP_CONCAT(
             CASE
                 WHEN cpg.`RegionDescription` = 'Westerns' THEN CONCAT(
-                    cpg.`ProductName`, '-', cpg.`Año`
+                    cpg.`ProductName`, ' - ', aypr.Años, ' - ', mcpg.MinGanancias
                 )
-            END SEPARATOR ', '
+            END SEPARATOR '; '
         ), 'N/A'
     ) AS 'OESTE'
 FROM
     customer_product_gains AS cpg
     INNER JOIN min_customer_product_gains AS mcpg ON cpg.`CustomerID` = mcpg.`CustomerID`
     AND cpg.`RegionDescription` = mcpg.`RegionDescription`
+    AND cpg.`ProductName` = mcpg.`ProductName`
     AND cpg.`Ganancias` = mcpg.`MinGanancias`
+    INNER JOIN all_years_product_region AS aypr ON cpg.`CustomerID` = aypr.`CustomerID`
+    AND cpg.`RegionDescription` = aypr.`RegionDescription`
+    AND cpg.`ProductName` = aypr.`ProductName`
 GROUP BY
-    cpg.`CustomerID`;
+    cpg.`CustomerID`,
+    cpg.`RegionDescription`
+ORDER BY cpg.`ContactName`, cpg.`CompanyName`;
 
 ------------------------------------------------------------
