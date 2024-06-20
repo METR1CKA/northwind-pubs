@@ -39,7 +39,8 @@ GROUP BY
     er.`RegionDescription`,
     cus.`CustomerID`,
     pr.`ProductName`,
-    YEAR(ord.`OrderDate`);
+    YEAR(ord.`OrderDate`)
+ORDER BY cus.`CustomerID`, cus.`ContactName`, er.`RegionDescription`, YEAR(ord.`OrderDate`);
 
 SELECT * FROM customer_product_gains;
 
@@ -59,7 +60,7 @@ FROM customer_product_gains AS cpg
 GROUP BY
     cpg.`CustomerID`,
     cpg.`RegionDescription`
-ORDER BY cpg.`CustomerID`, cpg.`ContactName`;
+ORDER BY cpg.`CustomerID`, cpg.`ContactName`, cpg.`RegionDescription`;
 
 SELECT * FROM min_customer_product_gains;
 
@@ -83,7 +84,7 @@ FROM customer_product_gains AS cpg
 GROUP BY
     cpg.`CustomerID`,
     cpg.`RegionDescription`
-ORDER BY cpg.`CustomerID`, cpg.`ContactName`;
+ORDER BY cpg.`CustomerID`, cpg.`Año`;
 
 SELECT * FROM all_years_product_region;
 
@@ -140,6 +141,4 @@ FROM
 GROUP BY
     cpg.`CustomerID`,
     cpg.`RegionDescription`
-ORDER BY cpg.`ContactName`, cpg.`CompanyName`;
-
-------------------------------------------------------------
+ORDER BY cpg.`CustomerID`, cpg.`RegionDescription`;
