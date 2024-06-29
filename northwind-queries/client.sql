@@ -3,9 +3,7 @@ USE northwind;
 
 ------------------------------------------------------------
 # Crear una vista que muestre todas los empleados region
-DROP VIEW IF EXISTS employeeregion;
-
-CREATE VIEW employeeregion AS
+CREATE OR REPLACE VIEW employeeregion AS
 SELECT DISTINCT
     em.`EmployeeID`,
     reg.`RegionDescription`
@@ -20,9 +18,7 @@ SELECT * FROM employeeregion;
 
 ------------------------------------------------------------
 # Crear una vista que muestre todas las ganancias de los clientes
-DROP VIEW IF EXISTS customerpurchases;
-
-CREATE VIEW customerpurchases AS
+CREATE OR REPLACE VIEW customerpurchases AS
 SELECT
     cus.`CustomerID`,
     cus.`ContactName`,
@@ -48,9 +44,7 @@ SELECT * FROM customerpurchases;
 
 ------------------------------------------------------------
 # Crear la vista de las compras máximas por año y región
-DROP VIEW IF EXISTS maxpurchases;
-
-CREATE VIEW maxpurchases AS
+CREATE OR REPLACE VIEW maxpurchases AS
 SELECT
     OrderYear,
     RegionDescription,
