@@ -15,6 +15,8 @@ FROM
     JOIN `Territories` AS ter ON et.`TerritoryID` = ter.`TerritoryID`
     JOIN `Region` AS reg ON ter.`RegionID` = reg.`RegionID`;
 
+DROP VIEW IF EXISTS regions;
+
 CREATE OR REPLACE VIEW regions AS
 SELECT DISTINCT
     reg.`RegionDescription`
@@ -28,20 +30,28 @@ SELECT * FROM empleado_region;
 
 SELECT * FROM regions;
 
+DROP VIEW IF EXISTS Eastern;
+
 CREATE OR REPLACE VIEW Eastern AS
 SELECT reg.`RegionDescription` AS region FROM regions AS reg LIMIT 0, 1;
 
 SELECT * FROM Eastern;
+
+DROP VIEW IF EXISTS Northern;
 
 CREATE OR REPLACE VIEW Northern AS
 SELECT reg.`RegionDescription` AS region FROM regions AS reg LIMIT 1, 1;
 
 SELECT * FROM Northern;
 
+DROP VIEW IF EXISTS Southern;
+
 CREATE OR REPLACE VIEW Southern AS
 SELECT reg.`RegionDescription` AS region FROM regions AS reg LIMIT 2, 1;
 
 SELECT * FROM Southern;
+
+DROP VIEW IF EXISTS Westerns;
 
 CREATE OR REPLACE VIEW Westerns AS
 SELECT reg.`RegionDescription` AS region FROM regions AS reg LIMIT 3, 1;
